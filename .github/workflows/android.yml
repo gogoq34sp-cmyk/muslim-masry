@@ -1,0 +1,73 @@
+name: Build Android
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      HAS_KEYSTORE: ${{ secrets.KEYSTORE_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Add Android project
+        run: npx cap add android
+
+      - name: Copy sounds, notification icon and permissions
+        run: npm run setup-android
+
+      - name: Generate app icons
+        run: |
+          npm i -D @capacitor/assets
+          npx capacitor-assets generate --android
+
+      - name: Sync web files
+        run: npx cap sync android
+
+      - name: Build debug APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: muslim-masry-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      # الخطوات التالية تعمل فقط لو أضفت أسرار التوقيع في إعدادات المستودع:
+      # KEYSTORE_BASE64 و KEYSTORE_PASSWORD و KEY_ALIAS
+      - name: Build release bundle
+        if: env.HAS_KEYSTORE == 'true'
+        working-directory: android
+        run: ./gradlew bundleRelease
+
+      - name: Sign release bundle
+        if: env.HAS_KEYSTORE == 'true'
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+          jarsigner -keystore release.keystore -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
+            android/app/build/outputs/bundle/release/app-release.aab "${{ secrets.KEY_ALIAS }}"
+
+      - name: Upload signed bundle
+        if: env.HAS_KEYSTORE == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: muslim-masry-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab

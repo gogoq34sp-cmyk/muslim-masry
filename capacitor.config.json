@@ -1,0 +1,11 @@
+{
+  "appId": "com.muslimmasry.app",
+  "appName": "مسلم مصري",
+  "webDir": "www",
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_notify",
+      "iconColor": "#0F6B5C"
+    }
+  }
+}
