@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>مسلم مصري</title><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>ميقات</title><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
 
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Reem+Kufi:wght@500;700&display=swap">
@@ -113,7 +113,9 @@ details.adj .body{padding:0 16px 16px;display:grid;gap:4px}
 .dot{width:100%;max-width:30px;min-height:32px;margin-inline:auto;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;padding:0}
 .dot[aria-pressed="true"]{background:var(--ok);border-color:transparent}
 .qb{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
-.qb svg{width:132px;height:132px}
+.qb .mark{fill:var(--ink)}
+.qb svg.aligned .arrow{fill:var(--ok)}
+.qb svg{width:150px;height:150px}
 .qb .ring{fill:none;stroke:var(--line);stroke-width:2}
 .qb .tick{stroke:var(--muted);stroke-width:2;stroke-linecap:round}
 .qb text{fill:var(--muted);font-size:13px;font-family:var(--font-body)}
@@ -172,7 +174,7 @@ details.adj .body{padding:0 16px 16px;display:grid;gap:4px}
 <div class="wrap">
   <header class="top">
     <div>
-      <div class="brand">مسلم مصري</div>
+      <div class="brand">ميقات</div>
       <div class="date" id="date"></div>
     </div>
     <select class="sel" id="gov" aria-label="المحافظة"></select>
@@ -623,12 +625,40 @@ function qiblaDeg(lat,lng){var p1=lat*D2R,p2=KAABA.lat*D2R,dl=(KAABA.lng-lng)*D2
 var DIRS=['الشمال','الشمال الشرقي','الشرق','الجنوب الشرقي','الجنوب','الجنوب الغربي','الغرب','الشمال الغربي'];
 function renderQibla(){
   var g=curGov(),deg=qiblaDeg(g.lat,g.lng),dir=DIRS[Math.round(deg/45)%8],r=Math.round(deg);
-  $('#qibla').innerHTML='<div class="qb"><svg viewBox="0 0 160 160" role="img" aria-label="اتجاه القبلة '+toAr(r)+' درجة"><circle class="ring" cx="80" cy="80" r="70"/>'+
-   '<line class="tick" x1="80" y1="10" x2="80" y2="20"/><line class="tick" x1="150" y1="80" x2="140" y2="80"/><line class="tick" x1="80" y1="150" x2="80" y2="140"/><line class="tick" x1="10" y1="80" x2="20" y2="80"/>'+
-   '<text x="80" y="36" text-anchor="middle">ش</text><text x="130" y="85" text-anchor="middle">ق</text><text x="80" y="136" text-anchor="middle">ج</text><text x="30" y="85" text-anchor="middle">غ</text>'+
-   '<g transform="rotate('+deg.toFixed(1)+' 80 80)"><path class="arrow" d="M80 24 L91 82 L80 74 L69 82 Z"/></g><circle class="hub" cx="80" cy="80" r="6"/></svg>'+
-   '<div><p>القبلة من <b>'+g.n+'</b> بزاوية <b>'+toAr(r)+'°</b> من الشمال، ناحية '+dir+'.</p><p class="note">الزاوية تُقاس من الشمال مع عقارب الساعة. الصفحة لا تقرأ بوصلة الجهاز، فحدّد الشمال بتطبيق البوصلة في موبايلك ثم استدر بهذه الزاوية.</p></div></div>';
+  QDEG=deg;
+  $('#qibla').innerHTML='<div class="qb"><svg id="qsvg" viewBox="0 0 160 160" role="img" aria-label="بوصلة القبلة"><path class="mark" d="M80 2 L87 14 L73 14 Z"/><g id="qdial"><circle class="ring" cx="80" cy="80" r="66"/>'+
+   '<line class="tick" x1="80" y1="14" x2="80" y2="24"/><line class="tick" x1="146" y1="80" x2="136" y2="80"/><line class="tick" x1="80" y1="146" x2="80" y2="136"/><line class="tick" x1="14" y1="80" x2="24" y2="80"/>'+
+   '<text x="80" y="40" text-anchor="middle">ش</text><text x="124" y="85" text-anchor="middle">ق</text><text x="80" y="130" text-anchor="middle">ج</text><text x="36" y="85" text-anchor="middle">غ</text></g>'+
+   '<g id="qarrow"><path class="arrow" d="M80 26 L91 82 L80 74 L69 82 Z"/></g><circle class="hub" cx="80" cy="80" r="6"/></svg>'+
+   '<div><p>القبلة من <b>'+g.n+'</b> بزاوية <b>'+toAr(r)+'°</b> من الشمال، ناحية '+dir+'.</p><p class="note" id="qlive">ضع الموبايل أفقياً وحرّكه ببطء لتعمل البوصلة الحية، وحرّكه على شكل ٨ لو كانت غير دقيقة. السهم يشير للقبلة. إن لم يتحرك السهم فاعتمد على الزاوية المكتوبة.</p></div></div>';
+  updateCompass();
 }
+var HEADING=null,SM=null,QDEG=0;
+function compassHeading(alpha,beta,gamma){
+  var d=Math.PI/180,a=alpha*d,b=beta*d,g=gamma*d,cA=Math.cos(a),sA=Math.sin(a),cB=Math.cos(b),sB=Math.sin(b),cG=Math.cos(g),sG=Math.sin(g);
+  var tx=-sA*cB,ty=cA*cB,bx=-(cA*sG+sA*sB*cG),by=-(sA*sG-cA*sB*cG);
+  var x,y;
+  if(Math.sqrt(tx*tx+ty*ty)>=Math.sqrt(bx*bx+by*by)){x=tx;y=ty}else{x=bx;y=by}
+  return Math.atan2(x,y)/d;
+}
+function updateCompass(){
+  var dial=document.getElementById('qdial'),arr=document.getElementById('qarrow'),svg=document.getElementById('qsvg'),st=document.getElementById('qlive');
+  if(!dial||!arr||!svg)return;
+  var h=SM===null?0:SM;
+  dial.setAttribute('transform','rotate('+(-h).toFixed(1)+' 80 80)');
+  arr.setAttribute('transform','rotate('+(QDEG-h).toFixed(1)+' 80 80)');
+  if(SM!==null){var diff=((QDEG-SM+540)%360)-180,ok=Math.abs(diff)<5;svg.setAttribute('class',ok?'aligned':'');if(st)st.textContent=ok?'أنت في اتجاه القبلة.':'اتجاه الموبايل الآن '+toAr(Math.round(SM))+'°. دوّر الموبايل حتى يصير السهم لأعلى.'}
+}
+function onOrient(e){
+  var h=null;
+  if(typeof e.webkitCompassHeading==='number')h=e.webkitCompassHeading;
+  else if(typeof e.alpha==='number'&&(e.absolute||e.type==='deviceorientationabsolute')){h=(typeof e.beta==='number'&&typeof e.gamma==='number')?compassHeading(e.alpha,e.beta,e.gamma):(360-e.alpha)%360}
+  if(h===null||isNaN(h))return;
+  h=(h%360+360)%360;
+  if(SM===null)SM=h;else{var dd=((h-SM+540)%360)-180;SM=(SM+dd*0.25+360)%360}
+  HEADING=h;updateCompass();
+}
+try{window.addEventListener('deviceorientationabsolute',onOrient,true);window.addEventListener('deviceorientation',onOrient,true)}catch(e){}
 
 function renderWeek(){
   var c=cairo(Date.now()),days=[],i,tot=0,html='<div class="wk"><span></span>',wf=new Intl.DateTimeFormat('ar-EG',{timeZone:'UTC',weekday:'short'});

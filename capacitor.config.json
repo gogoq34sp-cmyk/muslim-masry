@@ -1,6 +1,6 @@
 {
-  "appId": "com.muslimmasry.app",
-  "appName": "مسلم مصري",
+  "appId": "com.miqat.egypt",
+  "appName": "ميقات",
   "webDir": "www",
   "plugins": {
     "LocalNotifications": {

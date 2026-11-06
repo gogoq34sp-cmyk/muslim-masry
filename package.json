@@ -1,8 +1,8 @@
 {
-  "name": "muslim-masry",
+  "name": "miqat",
   "version": "1.0.0",
   "private": true,
-  "description": "مسلم مصري: مواقيت الصلاة والأذان والأذكار",
+  "description": "ميقات: مواقيت الصلاة والأذان والأذكار",
   "scripts": {
     "setup-android": "node scripts/setup-android.js",
     "sync": "npx cap sync android"
