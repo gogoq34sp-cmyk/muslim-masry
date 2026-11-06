@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       HAS_KEYSTORE: ${{ secrets.KEYSTORE_BASE64 != '' }}
     steps:
@@ -50,6 +52,19 @@ jobs:
         with:
           name: muslim-masry-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Publish debug APK to a branch
+        run: |
+          mkdir -p /tmp/out
+          cp android/app/build/outputs/apk/debug/app-debug.apk /tmp/out/
+          cd /tmp/out
+          git init -q
+          git checkout -q -b debug-apk
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -q -m "debug apk"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" debug-apk
 
       # الخطوات التالية تعمل فقط لو أضفت أسرار التوقيع في إعدادات المستودع:
       # KEYSTORE_BASE64 و KEYSTORE_PASSWORD و KEY_ALIAS
